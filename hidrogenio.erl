@@ -16,7 +16,7 @@ criaMoleculaHidrogenio(Contador, Maximo)->
 			
 			if
 				Contador >= 10 -> CriouHidrogenio = verificarCriouHidrogenio();
-				Contador == 30 -> CriouHidrogenio = 1;
+				Contador == 30 -> CriouHidrogenio = 5;
 				true -> CriouHidrogenio = 0
 			end,
 			

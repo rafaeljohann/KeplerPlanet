@@ -16,7 +16,7 @@ criaMoleculaOxigenio(Contador, Maximo)->
 			
 			if
 				Contador >= 10 -> CriouOxigenio = verificarCriouOxigenio();
-				Contador == 30 -> CriouOxigenio = 1;
+				Contador == 30 -> CriouOxigenio = 5;
 				true -> CriouOxigenio = 0
 			end,
 			

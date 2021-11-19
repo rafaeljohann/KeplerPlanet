@@ -1,32 +1,20 @@
 -module(oxigenio).
--export([start/1, criaMoleculaOxigenio/2, verificarCriouOxigenio/0]).
+-export([keepCreating/2, createOxygen/1, sendEnergizedAtom/2]).
 
-start(Num) when not is_number(Num)-> {error,not_a_number};
-start(Num)->spawn(fun()->criaMoleculaOxigenio(1, Num) end).
+sendEnergizedAtom(HandlerPid, OxygenPid) ->
+  HandlerPid ! {oxygen, OxygenPid}.
 
-criaMoleculaOxigenio(Contador, Maximo)->
-    
-	erlang:start_timer(1000, self(), []),
-    receive
-          {timeout, Tref, _} ->
-            erlang:cancel_timer(Tref),
-		
-			io:format("Contador: ~p~n", [Contador]),
-			io:format("Maximo: ~p~n", [Maximo]),
-			
-			if
-				Contador >= 10 -> CriouOxigenio = verificarCriouOxigenio();
-				Contador == 30 -> CriouOxigenio = 5;
-				true -> CriouOxigenio = 0
-			end,
-			
-			io:format("CRIOU~p~n", [CriouOxigenio]),
-			
-            if
-                (Contador =:=Maximo) or (CriouOxigenio =:= 5) -> io:format("Criei molécula de oxigênio!~n");
-                true -> criaMoleculaOxigenio(Contador+1, Maximo)
-            end
-    end.
-	
-verificarCriouOxigenio() ->
-	rand:uniform(5).
+createOxygen(HandlerPid) ->
+  OxygenPid = self(),
+  RandomTime = (rand:uniform(21) + 9) * 1000,
+  io:format("RandomTime ~p para o oxigenio ~p.~n", [RandomTime/1000, OxygenPid]),
+  io:format("Criando Oxigenio ~p~n",[OxygenPid]),
+
+  timer:apply_after(RandomTime, oxigenio, sendEnergizedAtom, [HandlerPid, OxygenPid]).
+
+keepCreating(Interval, HandlerPid) when not is_number(Interval) -> {error, not_a_number};
+keepCreating(Interval, HandlerPid) ->
+  IntervalInMilleseconds = Interval * 1000,
+  timer:sleep(IntervalInMilleseconds),
+  spawn(fun() -> createOxygen(HandlerPid) end),
+  keepCreating(Interval, HandlerPid).

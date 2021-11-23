@@ -1,32 +1,21 @@
 -module(hidrogenio).
--export([start/1, criaMoleculaHidrogenio/2, verificarCriouHidrogenio/0]).
+-export([keepCreating/2, createHydrogen/1, sendEnergizedAtom/2]).
 
-start(Num) when not is_number(Num)-> {error,not_a_number};
-start(Num)->spawn(fun()->criaMoleculaHidrogenio(1, Num) end).
+sendEnergizedAtom(HandlerPid, HydrogenPid) ->
+  HandlerPid ! {hydrogen, HydrogenPid}.
 
-criaMoleculaHidrogenio(Contador, Maximo)->
-    
-	erlang:start_timer(1000, self(), []),
-    receive
-          {timeout, Tref, _} ->
-            erlang:cancel_timer(Tref),
-		
-			io:format("Contador: ~p~n", [Contador]),
-			io:format("Maximo: ~p~n", [Maximo]),
-			
-			if
-				Contador >= 10 -> CriouHidrogenio = verificarCriouHidrogenio();
-				Contador == 30 -> CriouHidrogenio = 5;
-				true -> CriouHidrogenio = 0
-			end,
-			
-			io:format("CRIOU~p~n", [CriouHidrogenio]),
-			
-            if
-                (Contador =:=Maximo) or (CriouHidrogenio =:= 5) -> io:format("Criei molécula de hidrogênio!~n");
-                true -> criaMoleculaHidrogenio(Contador+1, Maximo)
-            end
-    end.
-	
-verificarCriouHidrogenio() ->
-	rand:uniform(5).
+createHydrogen(HandlerPid) ->
+  HydrogenPid = self(),
+  RandomTime = (rand:uniform(21) + 9) * 1000,
+
+  io:format("RandomTime ~p para o hidrogenio ~p.~n", [RandomTime/1000, HydrogenPid]),
+  io:format("Criando Hydrogenio ~p~n",[HydrogenPid]),
+
+  timer:apply_after(RandomTime, hidrogenio, sendEnergizedAtom, [HandlerPid, HydrogenPid]).
+
+keepCreating(Interval, HandlerPid) when not is_number(Interval) -> {error, not_a_number};
+keepCreating(Interval, HandlerPid) ->
+  IntervalInMilleseconds = Interval * 1000,
+  timer:sleep(IntervalInMilleseconds),
+  spawn(fun() -> createHydrogen(HandlerPid) end),
+  keepCreating(Interval, HandlerPid).

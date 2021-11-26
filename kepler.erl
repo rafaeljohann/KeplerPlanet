@@ -6,48 +6,46 @@ createAtoms(HydrogenInterval, OxygenInterval, WaterPid) ->
   spawn(hidrogenio, keepCreating, [HydrogenInterval, WaterPid]),
   spawn(oxigenio, keepCreating, [OxygenInterval, WaterPid]).
 
-createWaterParticle(OxigenioCount, HidrogenioCount, ListOxigenio, ListHidrogenio) ->
-	io:format("---ENTROU NO MÉTODO DE CRIAR PARTÍCULA---~n", []),
-	io:format("Qtd Hidrogênio ~p~n", [HidrogenioCount]),
-	io:format("Qtd Oxigênio ~p~n", [OxigenioCount]),
+createWaterParticle(OxygenCount, HydrogenCount, ListOxygen, ListHydrogen) ->
+	io:format("Qtd Hidrogênio ~p~n", [HydrogenCount]),
+	io:format("Qtd Oxigênio ~p~n", [OxygenCount]),
 	receive
 		{oxygen, OxygenPid} ->
-			io:format("Oxigênio energizado!~n", []),
-			CountOxigenio = 1,
-			CountHidrogenio = 0,
-			ListTotalOxigenio = [OxygenPid | ListOxigenio],
-			ListTotalHidrogenio = ListHidrogenio,
-			N = length(ListOxigenio),
-			io:format("Tamanho lista oxigênio ~p~n", [N]);
+			io:format("Oxigênio ~p energizado!~n", [OxygenPid]),
+			CountOneOxygen = 1,
+			CountOneHydrogen = 0,
+			ListTotalOxygen = [OxygenPid | ListOxygen],
+			ListTotalHydrogen = ListHydrogen;
 		{hydrogen, HydrogenPid} ->
-			io:format("Hidrogênio energizado!~n", []),
-			CountHidrogenio = 1,
-			CountOxigenio = 0,
-			ListTotalHidrogenio = [HydrogenPid | ListHidrogenio],
-			ListTotalOxigenio = ListOxigenio,
-			N = length(ListHidrogenio),
-			io:format("Tamanho lista hidrogenio ~p~n", [N])
+			io:format("Hidrogênio ~p energizado!~n", [HydrogenPid]),
+			CountOneHydrogen = 1,
+			CountOneOxygen = 0,
+			ListTotalHydrogen = [HydrogenPid | ListHydrogen],
+			ListTotalOxygen = ListOxygen
 	end,
 	
 	if
-		(OxigenioCount + CountOxigenio) > 1,
-		(HidrogenioCount + CountHidrogenio) > 0 -> io:format("Criei partícula de água formado pelas partículas de oxigênio ~p, ~p e hidrogênio ~p!~n", [lists:nth(1, ListTotalOxigenio), lists:nth(2, ListTotalOxigenio), lists:nth(1, ListTotalHidrogenio)]),
-		%%ElementOxygenRemove = lists:nth(1, ListTotalOxigenio),
-		%%ListTotalOxigenio = lists:delete(ElementOxygenRemove, ListTotalOxigenio),
-		%%ListTotalOxigenio = ListTotalOxigenio -- lists:nth(1, ListTotalOxigenio),
-		%%ListTotalHidrogenio = ListTotalOxigenio -- lists:nth(1, ListTotalHidrogenio),
-		createWaterParticle(OxigenioCount - 1, HidrogenioCount - 1, ListTotalOxigenio, ListTotalHidrogenio);
-		CountHidrogenio =:= 1,
-		  CountOxigenio =:= 0 -> createWaterParticle(OxigenioCount, HidrogenioCount + 1, ListTotalOxigenio, ListTotalHidrogenio);
-		CountHidrogenio =:= 0,
-		  CountOxigenio =:= 1 -> createWaterParticle(OxigenioCount + 1, HidrogenioCount, ListTotalOxigenio, ListTotalHidrogenio);
-		true -> createWaterParticle(OxigenioCount, HidrogenioCount, ListTotalOxigenio, ListTotalHidrogenio)
+		(OxygenCount + CountOneOxygen) > 1,
+		(HydrogenCount + CountOneHydrogen) > 0 -> 
+		ListSizeHydrogen = length(ListTotalHydrogen),
+		HydrogenElement = lists:nth(ListSizeHydrogen, ListTotalHydrogen),
+		io:format("Criei partícula de água formado pelas partículas de oxigênio ~p, ~p e hidrogênio ~p!~n", [lists:nth(1, ListTotalOxygen), lists:nth(2, ListTotalOxygen), HydrogenElement]),
+		
+		if
+			ListSizeHydrogen == 1 -> NewListHydrogen = [];
+			true -> NewListHydrogen = ListTotalHydrogen -- [HydrogenElement]
+		end,
+		
+		createWaterParticle(OxygenCount - 1, HydrogenCount - 1, [], NewListHydrogen);
+		CountOneHydrogen =:= 1,
+		  CountOneOxygen =:= 0 -> createWaterParticle(OxygenCount, HydrogenCount + 1, ListTotalOxygen, ListTotalHydrogen);
+		CountOneHydrogen =:= 0,
+		  CountOneOxygen =:= 1 -> createWaterParticle(OxygenCount + 1, HydrogenCount, ListTotalOxygen, ListTotalHydrogen);
+		true -> createWaterParticle(OxygenCount, HydrogenCount, ListTotalOxygen, ListTotalHydrogen)
 	end.
 
 createWorld(HydrogenInterval, OxygenInterval) ->
-  ListOxigenio = [],
-  ListHidrogenio = [],
-  WaterPid = spawn(kepler, createWaterParticle, [0, 0, ListOxigenio, ListHidrogenio]),
-  %%HidrogenioPid = spawn(kepler, verifyHidrogenio, [WaterPid]),
-  %%OxygenPid = spawn(kepler, verifyOxygen, [WaterPid, ListOxigenio]),
+  ListOxygen = [],
+  ListHydrogen = [],
+  WaterPid = spawn(kepler, createWaterParticle, [0, 0, ListOxygen, ListHydrogen]),
   AtomsCreatorPid = spawn(fun() -> createAtoms(HydrogenInterval, OxygenInterval, WaterPid) end).

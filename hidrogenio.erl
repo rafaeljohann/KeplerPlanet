@@ -10,7 +10,7 @@ createHydrogen(HandlerPid) ->
 
   io:format("RandomTime ~p para o hidrogenio ~p.~n", [RandomTime/1000, HydrogenPid]),
   io:format("Criando Hydrogenio ~p~n",[HydrogenPid]),
-
+  
   timer:apply_after(RandomTime, hidrogenio, sendEnergizedAtom, [HandlerPid, HydrogenPid]).
 
 keepCreating(Interval, HandlerPid) when not is_number(Interval) -> {error, not_a_number};

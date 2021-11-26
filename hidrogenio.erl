@@ -8,8 +8,8 @@ createHydrogen(HandlerPid) ->
   HydrogenPid = self(),
   RandomTime = (rand:uniform(21) + 9) * 1000,
 
-  io:format("RandomTime ~p para o hidrogenio ~p.~n", [RandomTime/1000, HydrogenPid]),
-  io:format("Criando Hydrogenio ~p~n",[HydrogenPid]),
+  io:format("RandomTime ~p para o Hidrogenio ~p.~n", [RandomTime/1000, HydrogenPid]),
+  io:format("Criando Hidrogenio ~p~n",[HydrogenPid]),
 
   timer:apply_after(RandomTime, hidrogenio, sendEnergizedAtom, [HandlerPid, HydrogenPid]).
 

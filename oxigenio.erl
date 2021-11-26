@@ -7,7 +7,8 @@ sendEnergizedAtom(HandlerPid, OxygenPid) ->
 createOxygen(HandlerPid) ->
   OxygenPid = self(),
   RandomTime = (rand:uniform(21) + 9) * 1000,
-  io:format("RandomTime ~p para o oxigenio ~p.~n", [RandomTime/1000, OxygenPid]),
+
+  io:format("RandomTime ~p para o Oxigenio ~p.~n", [RandomTime/1000, OxygenPid]),
   io:format("Criando Oxigenio ~p~n",[OxygenPid]),
 
   timer:apply_after(RandomTime, oxigenio, sendEnergizedAtom, [HandlerPid, OxygenPid]).

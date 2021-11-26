@@ -29,14 +29,15 @@ createWaterParticle(OxygenCount, HydrogenCount, ListOxygen, ListHydrogen) ->
 		(HydrogenCount + CountOneHydrogen) > 0 -> 
 		ListSizeHydrogen = length(ListTotalHydrogen),
 		HydrogenElement = lists:nth(ListSizeHydrogen, ListTotalHydrogen),
-		io:format("Criei partícula de água formado pelas partículas de oxigênio ~p, ~p e hidrogênio ~p!~n", [lists:nth(1, ListTotalOxygen), lists:nth(2, ListTotalOxygen), HydrogenElement]),
+		io:format("Criei partícula de água formado pelas moléculas de oxigênio ~p, ~p e hidrogênio ~p!~n", [lists:nth(1, ListTotalOxygen), lists:nth(2, ListTotalOxygen), HydrogenElement]),
 		
 		if
 			ListSizeHydrogen == 1 -> NewListHydrogen = [];
+			ListSizeHydrogen == 0 -> NewListHydrogen = [];
 			true -> NewListHydrogen = ListTotalHydrogen -- [HydrogenElement]
 		end,
 		
-		createWaterParticle(OxygenCount - 1, HydrogenCount - 1, [], NewListHydrogen);
+		createWaterParticle(OxygenCount + CountOneOxygen - 2, HydrogenCount + CountOneHydrogen - 1, [], NewListHydrogen);
 		CountOneHydrogen =:= 1,
 		  CountOneOxygen =:= 0 -> createWaterParticle(OxygenCount, HydrogenCount + 1, ListTotalOxygen, ListTotalHydrogen);
 		CountOneHydrogen =:= 0,

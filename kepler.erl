@@ -1,13 +1,13 @@
 -module(kepler).
--export([createAtoms/3, handleKaplerWorld/2, createWorld/2, createWater/3]).
+-export([createAtoms/2, handleKaplerWorld/2, createWorld/1, createWater/3]).
 
-createAtoms(HydrogenInterval, OxygenInterval, HandlerPid) when not is_number(HydrogenInterval) and is_number(OxygenInterval) -> {error, not_a_number};
-createAtoms(HydrogenInterval, OxygenInterval, HandlerPid) ->
-  spawn(hidrogenio, keepCreating, [HydrogenInterval, HandlerPid]),
-  spawn(oxigenio, keepCreating, [OxygenInterval, HandlerPid]).
+createAtoms(Interval, HandlerPid) when not is_number(Interval) -> {error, not_a_number};
+createAtoms(Interval, HandlerPid) ->
+  spawn(moleculas, keepCreating, [Interval, HandlerPid]).
 
 createWater(OxygenAtom, HydrogenAtomOne, HydrogenAtomTwo) ->
-  io:format("Criando água com os atomos: 2 Hidrogenios(~p~p) e 1 Oxigenio(~p)~n", [ HydrogenAtomOne, HydrogenAtomTwo, OxygenAtom]).
+  io:format("Criando água com os atomos: 2 Hidrogenios(~p~p) e 1 Oxigenio(~p)~n", [ HydrogenAtomOne, HydrogenAtomTwo, OxygenAtom]),
+  io:format("Criado água ~p~n", [self()]).
 
 handleKaplerWorld(OldOxygenList, OldHydrogenList) ->
   receive
@@ -43,8 +43,8 @@ handleKaplerWorld(OldOxygenList, OldHydrogenList) ->
   end,
   handleKaplerWorld(NewOxygenList, NewHydrogenList).
 
-createWorld(HydrogenInterval, OxygenInterval) ->
+createWorld(Interval) ->
   OxygenList = [],
   HydrogenList = [],
   HandlerPid = spawn(fun() -> handleKaplerWorld(OxygenList, HydrogenList) end),
-  AtomsCreatorPid = spawn(fun() -> createAtoms(HydrogenInterval, OxygenInterval, HandlerPid) end).
+  AtomsCreatorPid = spawn(fun() -> createAtoms(Interval, HandlerPid) end).
